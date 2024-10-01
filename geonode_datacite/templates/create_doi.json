@@ -1,0 +1,14 @@
+{
+  "data": {
+    "type": "dois",
+    "attributes": {
+      "event": "draft",
+      "prefix": "{{prefix}}",
+      "creators": {{creators|safe|escape}},
+      "titles": {{titles|safe|escape}},
+      "publisher": {{publisher|safe|escape}},
+      "publicationYear": {{publication_year|safe|escape}},
+      "url": "{{url}}"
+    }
+  }
+}

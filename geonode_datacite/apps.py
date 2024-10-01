@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class GeonodeDataciteConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'geonode_datacite'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "geonode_datacite"
