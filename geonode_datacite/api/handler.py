@@ -23,7 +23,7 @@ class DataCiteHandler:
         self.password = settings.DATACITE_API_PASSWORD
         self.prefix = getattr(settings, "DATACITE_PREFIX", "10.82863")
 
-    def call_api(self, data: Dict, method: str) -> Dict:
+    def call_api(self, data: Dict, method: str, pk: str= None) -> Dict:
         """
         create the DOI via API and return the payload generated
         """
@@ -34,11 +34,12 @@ class DataCiteHandler:
             "content-type": "application/json",
             "authorization": f"Basic {base64.b64encode(access).decode()}",
         }
+        url = f"{self.url}/dois/" + pk
         response = None
         try:
             http_metod = getattr(requests, method.lower())
             response = http_metod(
-                f"{self.url}/dois",
+                url,
                 json=data,
                 headers=headers,
             )
@@ -57,11 +58,11 @@ class DataCiteHandler:
         context = self.generate_schema(context=data)
         return self.call_api(context, method="POST")
 
-    def update_doi(self, data: Dict = {}, as_json=True) -> Dict:
+    def update_doi(self, data: Dict = {}, pk: str = None) -> Dict:
         """
         Given the context will update a DOI via API
         """
-        return self.call_api(data, method="PATCH")
+        return self.call_api(data, method="PATCH", pk=pk)
 
     def generate_schema(
         self, context: Dict = {}, template: str = "create_doi.json", as_json=True

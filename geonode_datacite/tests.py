@@ -1,4 +1,4 @@
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase
 
 from geonode_datacite.api.handler import DataCiteHandler
 
@@ -33,10 +33,9 @@ class TestDataciteSchema(SimpleTestCase):
             "data": {
                 "type": "dois",
                 "attributes": {
-                    "types": {"resourceTypeGeneral": "Dataset"},
-                    "doi": "10.82863/pvsq-2183",
+                    "types": {"resourceTypeGeneral": "random"},
                 },
             }
         }
-        response = self.sut.update_doi(data=context)
+        response = self.sut.update_doi(data=context, pk="10.82863/pvsq-2183")
         self.assertTrue(200, response.status_code)
