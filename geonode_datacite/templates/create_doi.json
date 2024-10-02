@@ -8,6 +8,7 @@
       "titles": {{titles|safe|escape}},
       "publisher": {{publisher|safe|escape}},
       "publicationYear": {{publication_year|safe|escape}},
+      "resourceTypeGeneral": "{{resource_type}}",
       "url": "{{url}}"
     }
   }

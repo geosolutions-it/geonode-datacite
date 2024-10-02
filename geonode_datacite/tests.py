@@ -14,6 +14,7 @@ class TestDataciteSchema(SimpleTestCase):
             "titles": [{"lang": "en", "title": "Example title"}],
             "publisher": {"lang": "en", "name": "GeoSolutions"},
             "publication_year": 2024,
+            "resourceTypeGeneral": "Dataset",
             "url": "https://geosolutionsgroup.com",
         }
 
@@ -39,3 +40,10 @@ class TestDataciteSchema(SimpleTestCase):
         }
         response = self.sut.update_doi(data=context, pk="10.82863/pvsq-2183")
         self.assertTrue(200, response.status_code)
+
+    def test_search_doi(self):
+        context = {}
+        response = self.sut.search_doi(data=context, pk="10.82863/pvsq-2183")
+        self.assertTrue(200, response.status_code)
+        response = response.json()
+        self.assertEqual("10.82863/pvsq-2183", response['data']['id'])

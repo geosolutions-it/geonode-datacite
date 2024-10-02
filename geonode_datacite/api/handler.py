@@ -64,6 +64,12 @@ class DataCiteHandler:
         """
         return self.call_api(data, method="PATCH", pk=pk)
 
+    def search_doi(self, data: Dict = {}, pk: str = None) -> Dict:
+        """
+        Given the context will update a DOI via API
+        """
+        return self.call_api({}, method="GET", pk=pk)
+
     def generate_schema(
         self, context: Dict = {}, template: str = "create_doi.json", as_json=True
     ) -> Dict:
