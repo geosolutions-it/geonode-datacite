@@ -73,6 +73,8 @@ class DataCiteHandler:
     def delete_doi(self, pk: str = None) -> Dict:
         """
         Given the context will delete the DOI. Must be in draft state
+        DOIs in Registered or Findable state cannot be deleted
+        https://support.datacite.org/docs/can-i-delete-or-change-my-dois
         """
         return self.call_api({}, method="DELETE", pk=pk)
 
