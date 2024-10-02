@@ -2,13 +2,13 @@
   "data": {
     "type": "dois",
     "attributes": {
-      "event": "draft",
+      "event": "{{event|title}}",
       "prefix": "{{prefix}}",
       "creators": {{creators|safe|escape}},
       "titles": {{titles|safe|escape}},
       "publisher": {{publisher|safe|escape}},
       "publicationYear": {{publication_year|safe|escape}},
-      "resourceTypeGeneral": "{{resource_type}}",
+      "types": {{types|safe|escape}},
       "url": "{{url}}"
     }
   }

@@ -2,19 +2,18 @@ from django.test import SimpleTestCase
 
 from geonode_datacite.api.handler import DataCiteHandler
 
-# Create your tests here.
-
 
 class TestDataciteSchema(SimpleTestCase):
     def setUp(self) -> None:
         self.sut = DataCiteHandler()
         self.context = {
+            "event": "Registered",
             "prefix": "10.82433",
             "creators": [{"name": "GeoSolutions", "nameType": "Organizational"}],
             "titles": [{"lang": "en", "title": "Example title"}],
             "publisher": {"lang": "en", "name": "GeoSolutions"},
             "publication_year": 2024,
-            "resourceTypeGeneral": "Dataset",
+            "types": {"resourceTypeGeneral": "Dataset"},
             "url": "https://geosolutionsgroup.com",
         }
 

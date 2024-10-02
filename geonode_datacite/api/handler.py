@@ -23,7 +23,7 @@ class DataCiteHandler:
         self.password = settings.DATACITE_API_PASSWORD
         self.prefix = getattr(settings, "DATACITE_PREFIX", "10.82863")
 
-    def call_api(self, data: Dict, method: str, pk: str= None) -> Dict:
+    def call_api(self, data: Dict, method: str, pk: str= "") -> Dict:
         """
         create the DOI via API and return the payload generated
         """
@@ -64,11 +64,17 @@ class DataCiteHandler:
         """
         return self.call_api(data, method="PATCH", pk=pk)
 
-    def search_doi(self, data: Dict = {}, pk: str = None) -> Dict:
+    def search_doi(self, pk: str = None) -> Dict:
         """
-        Given the context will update a DOI via API
+        Given the Doi IS will search it via API
         """
         return self.call_api({}, method="GET", pk=pk)
+
+    def delete_doi(self, pk: str = None) -> Dict:
+        """
+        Given the context will delete the DOI. Must be in draft state
+        """
+        return self.call_api({}, method="DELETE", pk=pk)
 
     def generate_schema(
         self, context: Dict = {}, template: str = "create_doi.json", as_json=True
