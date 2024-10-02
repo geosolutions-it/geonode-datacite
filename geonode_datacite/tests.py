@@ -45,4 +45,4 @@ class TestDataciteSchema(SimpleTestCase):
         response = self.sut.search_doi(data=context, pk="10.82863/pvsq-2183")
         self.assertTrue(200, response.status_code)
         response = response.json()
-        self.assertEqual("10.82863/pvsq-2183", response['data']['id'])
+        self.assertEqual("10.82863/pvsq-2183", response["data"]["id"])

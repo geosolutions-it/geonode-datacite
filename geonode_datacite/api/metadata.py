@@ -1,4 +1,4 @@
-class DataCiteMetadata:
+class DataCiteMetadataHandler:
     """
     DataCite requires additional metadata information which are not included by default
     in GeoNode

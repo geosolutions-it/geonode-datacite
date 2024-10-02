@@ -23,33 +23,6 @@ class DataCiteHandler:
         self.password = settings.DATACITE_API_PASSWORD
         self.prefix = getattr(settings, "DATACITE_PREFIX", "10.82863")
 
-    def call_api(self, data: Dict, method: str, pk: str= "") -> Dict:
-        """
-        create the DOI via API and return the payload generated
-        """
-
-        access = f"{self.user}:{self.password}".encode()
-        headers = {
-            "accept": "application/vnd.api+json",
-            "content-type": "application/json",
-            "authorization": f"Basic {base64.b64encode(access).decode()}",
-        }
-        url = f"{self.url}/dois/" + pk
-        response = None
-        try:
-            http_metod = getattr(requests, method.lower())
-            response = http_metod(
-                url,
-                json=data,
-                headers=headers,
-            )
-            response.raise_for_status()
-        except Exception as e:
-            if response is not None:
-                logger.error(response.json())
-            raise e
-        return response
-
     def create_doi(self, data: Dict = {}) -> Dict:
         """
         Given the context will populate the DataCite doi metadata schema
@@ -77,6 +50,33 @@ class DataCiteHandler:
         https://support.datacite.org/docs/can-i-delete-or-change-my-dois
         """
         return self.call_api({}, method="DELETE", pk=pk)
+
+    def call_api(self, data: Dict, method: str, pk: str = "") -> Dict:
+        """
+        create the DOI via API and return the payload generated
+        """
+
+        access = f"{self.user}:{self.password}".encode()
+        headers = {
+            "accept": "application/vnd.api+json",
+            "content-type": "application/json",
+            "authorization": f"Basic {base64.b64encode(access).decode()}",
+        }
+        url = f"{self.url}/dois/" + pk
+        response = None
+        try:
+            http_metod = getattr(requests, method.lower())
+            response = http_metod(
+                url,
+                json=data,
+                headers=headers,
+            )
+            response.raise_for_status()
+        except Exception as e:
+            if response is not None:
+                logger.error(response.json())
+            raise e
+        return response
 
     def generate_schema(
         self, context: Dict = {}, template: str = "create_doi.json", as_json=True
