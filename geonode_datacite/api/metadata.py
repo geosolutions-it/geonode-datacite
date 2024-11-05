@@ -1,3 +1,6 @@
+from geonode.metadata.enigne import Field
+
+
 class DataCiteMetadataHandler:
     """
     DataCite requires additional metadata information which are not included by default
@@ -17,4 +20,13 @@ class DataCiteMetadataHandler:
             - Publication Year (maybe the year when the resource is created?)
             - ResourceTypeGeneral: enum of the general type of the resource (see DataCiteFrabrica for the list)
         """
-        pass
+        return [
+            Field(
+                name="title", # mandatory
+                type="int", # mandatory
+                kwargs={ # optional
+                    "max_length": 255,
+                    "help_text": "name by which the cited resource is known"
+                }
+            )
+        ]

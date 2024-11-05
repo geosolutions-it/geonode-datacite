@@ -17,13 +17,6 @@ class TestDataciteSchema(SimpleTestCase):
             "url": "https://geosolutionsgroup.com",
         }
 
-    def test_creation_of_datacite_schema(self):
-        result = self.sut.generate_schema(context=self.context, as_json=False)
-        self.assertTrue(isinstance(result, str))
-
-        result = self.sut.generate_schema(context=self.context, as_json=True)
-        self.assertTrue(isinstance(result, dict))
-
     def test_create_doi(self):
         response = self.sut.create_doi(data=self.context)
         self.assertTrue(200, response.status_code)

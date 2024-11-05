@@ -1,11 +1,11 @@
 import base64
-import json
+from datetime import datetime
 import requests
 import logging
 
 from typing import Dict
 from django.conf import settings
-from django.template.loader import get_template
+from django.utils.translation import get_language
 
 logger = logging.getLogger("geonode")
 
@@ -28,13 +28,14 @@ class DataCiteHandler:
         Given the context will populate the DataCite doi metadata schema
         to generate the DOI via API
         """
-        context = self.generate_schema(context=data)
+        context = self.generate_schema(data=data)
         return self.call_api(context, method="POST")
 
     def update_doi(self, data: Dict = {}, pk: str = None) -> Dict:
         """
         Given the context will update a DOI via API
         """
+        data = self.generate_schema(data=data)
         return self.call_api(data, method="PATCH", pk=pk)
 
     def search_doi(self, pk: str = None) -> Dict:
@@ -78,14 +79,46 @@ class DataCiteHandler:
             raise e
         return response
 
-    def generate_schema(
-        self, context: Dict = {}, template: str = "create_doi.json", as_json=True
-    ) -> Dict:
+    def generate_schema(self, data: Dict = {}) -> Dict:
         """
         Given the context will populate the DataCite doi metadata schema
         to generate the DOI via API
         """
-        context["prefix"] = self.prefix
-        t = get_template(template)
-        t_as_str = t.render(context=context)
-        return t_as_str if not as_json else json.loads(t_as_str.replace("'", '"'))
+        return {
+            "data": {
+                "type": "dois",
+                "attributes": {
+                    "event": data.get("event", settings.DATACITE_EVENT),
+                    "prefix": data.get("prefix", self.prefix),
+                    "creators": [
+                        {
+                            "name": data.get("creator", settings.DATACITE_CREATOR),
+                            "nameType": data.get(
+                                "creator_type", settings.DATACITE_CREATOR_TYPE
+                            ),
+                        }
+                    ],
+                    "titles": [
+                        {
+                            "lang": data.get("lang", get_language()),
+                            "title": data.get("title"),
+                        }
+                    ],
+                    "publisher": {
+                        "lang": data.get("lang", get_language()),
+                        "publishder": data.get(
+                            "publisher", settings.DATACITE_PUBLISHER
+                        ),
+                    },
+                    "publicationYear": data.get(
+                        "publication_year", datetime.now().strftime("%Y")
+                    ),
+                    "types": {
+                        "resourceTypeGeneral": data.get(
+                            "resource_type", "Other"
+                        ).title()
+                    },
+                    "url": data.get("url"),
+                },
+            }
+        }
