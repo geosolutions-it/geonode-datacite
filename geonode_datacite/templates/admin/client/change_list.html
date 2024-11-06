@@ -1,0 +1,94 @@
+{% extends "admin/change_list.html" %}
+{{ block.super }}
+{% load humanize admin_list%}
+{% load static %}
+
+{% block result_list %}
+<style>
+.custom-admin-button {
+    border-color: lightgreen;
+    background-color: lightgreen;
+    border-radius: 25px;
+    padding: 8px
+  }
+
+.a-pointer {
+  cursor:pointer;
+}
+#loading-arrow {
+  max-width: 78px;
+  max-height: 55px;
+}
+.additional-actions {
+  max-width:100%;
+  float:right
+}
+.loading-arrow {
+  max-width: 78px;
+  max-height: 55px;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="{% static 'font-awesome/css/font-awesome.css' %}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="{% static 'js/clipboard.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/token_creation.js' %}"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<div class="grp-module grp-changelist-results">
+  <table id="result_list" cellspacing="0" class="grp-table">
+      <thead>
+          <tr>
+            <th class="action-checkbox"><input type="checkbox" name="_selected_action" value="4" class="action-select"></th>
+            <th scope="col" class="sortable column-id">          
+              <div class="grp-text">Datacite ID</div>
+            </th>
+            <th scope="col" class="sortable column-id">          
+              <div class="grp-text">Resource</div>
+            </th>
+            <th scope="col" class="sortable column-id">          
+              <div class="grp-text">Type</div>
+            </th>
+            <th scope="col" class="sortable column-id">          
+              <div class="grp-text">DOI</div>
+            </th>
+            <th scope="col" class="sortable column-id">          
+              <div class="grp-text">DataCite URL</div>
+            </th>
+            <th scope="col" class="sortable column-id">          
+              <div class="grp-text">Created at</div>
+            </th>
+            <th scope="col" class="sortable column-id">          
+              <div class="grp-text">Updated at</div>
+            </th>
+            <th scope="col" class="sortable column-id">          
+              <div class="grp-text">Publish</div>
+            </th>
+          </tr>
+      </thead>
+      <tbody>
+        {% for resource in cl.result_list %}              
+            <tr class="grp-row grp-row-even">
+              <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="{{resource.datacite_set.first.id}}" class="action-select"></td>
+              <th class="field-id"><a href="/en-us/admin/geonode_datacite/datacite/{{resource.datacite_set.first.id}}/change/">{{resource.datacite_set.first.id}}</a></th>
+              <td class="field-{{resource.pk}}"><a href="/en-us/admin/layers/{{resource.resource_type}}/{{resource.pk}}/change/">{{resource.title}}</a></td>
+              <td class="field-resource_type">{{resource.resource_type}}</td>
+              <td class="field-doi">{{resource.doi|default_if_none:""}}</td>
+              <td class="field-datacite-url"><a href="{{resource.datacite_set.first.url}}">{{resource.datacite_set.first.url}}</a></td>
+              <td class="field-datacite_published">{{resource.datacite_set.first.created_at}}</td>
+              <td class="field-datacite_published">{{resource.datacite_set.first.updated_at}}</td>
+              {% if resource.datacite_set.first.url %}
+              <td class="field-publisher"></td>
+              {% else %}
+              <td class="field-publisher"><a class="grp-button" href="generate/{{resource.pk}}">Publish new DOI</a></td>
+              {% endif %}
+            </tr>
+        {% endfor %}        
+      </tbody>
+  </table>
+</div>
+<script>
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
+</script>
+{% endblock %}
