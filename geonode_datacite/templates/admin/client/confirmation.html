@@ -1,0 +1,45 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+    <script src="{% static 'admin/js/cancel.js' %}" async></script>
+    
+<style>
+    .custom_alert {
+        position: relative;
+        padding: .75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: .25rem;
+        color: #856404;
+        background-color: #fff3cd;
+        border-color: #fff3cd;
+    }
+</style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="custom_alert">
+        <h1>Are you sure you want to publish the selected {{ resource }}?</h1><br>
+        <h2>Once the resource is published on DataCite the permissions on the resource are set to download</h2>
+        <br><h2>This operation cannot be reverted</h2>
+    </div>
+    <ul>{{ resource }}</ul>
+    <form method="post">{% csrf_token %}
+        <div>
+            <input type="hidden" name="action" value="delete_selected">
+            <input type="hidden" name="post" value="yes">
+            <br>
+            <input type="submit" value="{% translate 'Yes, I’m sure' %}">
+            <a href="{% url 'admin:geonode_datacite_datacite_changelist' %}" class="button cancel-link">{% translate "No, take me back" %}</a>
+        </div>
+    </form>
+{% endblock %}

@@ -2,7 +2,7 @@ import logging
 from django.conf import settings
 from django.contrib import admin
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import path
 
 from geonode_datacite.handler import datacite_handler
@@ -33,16 +33,31 @@ class DataCiteAdmin(admin.ModelAdmin):
     
     def get_urls(self):
         return [
-            path("generate/<resource_pk>", self.admin_site.admin_view(self.generate_doi), name="generate-doi"),
+            path("findable/<resource_pk>/confirmation", self.admin_site.admin_view(self.confirmation), name="confirmation-doi"),
+            path("findable/<resource_pk>", self.admin_site.admin_view(self.findable), name="confirmation-doi"),
+            path("draft/<resource_pk>", self.admin_site.admin_view(self.draft), name="draft-doi"),
         ] + super().get_urls()
+    
+    def confirmation(self, request, resource_pk):
+        if request.method == 'POST':
+            return self.findable(request, resource_pk)
+        resource = get_object_or_404(ResourceBase, pk=resource_pk)
+        return render(request, 'admin/client/confirmation.html', {"resource": resource})
 
-    def generate_doi(self, request, resource_pk):
+    def draft(self, request, resource_pk):
+        return self.generate_doi(request, resource_pk, event="Draft")
+
+    def findable(self, request, resource_pk):
+        return self.generate_doi(request, resource_pk, event="Findable")
+
+    def generate_doi(self, request, resource_pk, event):
         # getting GeoNode Resource
         try:
             resource = get_object_or_404(ResourceBase, pk=resource_pk)
             # callid datacite for the DOI generation
             response = datacite_handler.create_doi(
                 data={
+                    "event": event,
                     "title": resource.title,
                     "language": resource.language,
                     "resource_type": settings.DATACITE_TYPE_MAPPING.get(resource.subtype),
