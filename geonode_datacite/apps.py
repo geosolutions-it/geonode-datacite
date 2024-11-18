@@ -1,12 +1,16 @@
 from django.apps import AppConfig
-from geonode.metadata.registry import metadata_registry
-
 
 class GeonodeDataciteConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "geonode_datacite"
+    verbose_name = "GeoNode DataCite"
 
-    def ready(self):
-        metadata_registry.register_new_app(
-            "geonode_datacite.api.metadata.DataCiteMetadataHandler"
-        )
+    def run_setup_hooks(*args, **kwargs):
+
+        # from geonode.api.urls import router
+        import os
+        from django.conf import settings
+
+        LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
+
+        settings.TEMPLATES[0]["DIRS"].insert(0, os.path.join(LOCAL_ROOT, "templates"))

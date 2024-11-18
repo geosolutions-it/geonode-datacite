@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from geonode_datacite.api.handler import DataCiteHandler
+from geonode_datacite.handler import DataCiteHandler
 
 
 class TestDataciteSchema(SimpleTestCase):
