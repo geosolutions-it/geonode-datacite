@@ -27,12 +27,11 @@
 {% endblock %}
 
 {% block content %}
+    <h1>Are you sure you want to publish the resource: {{ resource }}?</h1><br>
     <div class="custom_alert">
-        <h1>Are you sure you want to publish the selected {{ resource }}?</h1><br>
         <h2>Once the resource is published on DataCite the permissions on the resource are set to download</h2>
         <br><h2>This operation cannot be reverted</h2>
     </div>
-    <ul>{{ resource }}</ul>
     <form method="post">{% csrf_token %}
         <div>
             <input type="hidden" name="action" value="delete_selected">
