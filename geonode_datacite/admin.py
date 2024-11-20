@@ -84,17 +84,17 @@ class DataCiteAdmin(admin.ModelAdmin):
 
             # callid datacite for the DOI generation
 
-            # response = datacite_handler.create_doi(
-            #    data={
-            #        "event": event,
-            #        "title": resource.title,
-            #        "language": resource.language,
-            #        "resource_type": DATACITE_TYPE_MAPPING.get(resource_type),
-            #        "url": build_absolute_uri(resource.detail_url)
-            #    }
-            # )
-            # data = response.json()
-            data = {"data": {"id": 1234}}
+            response = datacite_handler.create_doi(
+               data={
+                   "event": event,
+                   "title": resource.title,
+                   "language": resource.language,
+                   "resource_type": DATACITE_TYPE_MAPPING.get(resource_type),
+                   "url": build_absolute_uri(resource.detail_url)
+               }
+            )
+            data = response.json()
+
             obj = DataCite(
                 resource=resource,
                 url=f"{settings.DATACITE_DETAIL_URL}/{data['data']['id']}",
