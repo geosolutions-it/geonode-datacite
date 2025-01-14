@@ -23,3 +23,5 @@ class DataCite(models.Model):
 
     class Meta:
         verbose_name_plural = "Data Cite"
+        unique_together = ('id', 'resource',)
+

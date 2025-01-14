@@ -5,9 +5,10 @@ from geonode.security.permissions import VIEW_PERMISSIONS, DOWNLOAD_PERMISSIONS
 
 class DataCitePermissionsHandler(BasePermissionsHandler):
     @staticmethod
-    def fixup_perms(instance, perms_payload, *args, **kwargs):
+    def get_perms(instance, perms_payload, user=None, include_virtual=True, *args, **kwargs):
+
         datacite = DataCite.objects.filter(resource=instance).first()
-        if not datacite or (datacite.state != DataCite.State.findable.value):
+        if not include_virtual or not datacite or (datacite.state != DataCite.State.findable.value):
             return perms_payload
 
         # if is findable, we need to remove the edit permissions
@@ -18,6 +19,7 @@ class DataCitePermissionsHandler(BasePermissionsHandler):
         group_perms = DataCitePermissionsHandler._adjust_group_perms(
             perms_payload["groups"]
         )
+
         return {"users": user_perms, "groups": group_perms}
 
     @staticmethod

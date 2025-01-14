@@ -21,10 +21,13 @@ logger = logging.getLogger(__name__)
 
 class DataCiteAdmin(admin.ModelAdmin):
     model = ResourceBase
-    # list_display = ('resource', 'url', 'created_at', 'updated_at')
     change_list_template = "admin/client/change_list.html"
 
     def get_readonly_fields(self, request, obj=None):
+        """
+        Return the readonly fields for the change. view of the datacite.
+        Once is created, it cannot be updated
+        """
         if obj:  # editing an existing object
             return self.readonly_fields + (
                 "resource",
@@ -33,15 +36,36 @@ class DataCiteAdmin(admin.ModelAdmin):
                 "updated_at",
             )
         return self.readonly_fields
-
+    
     def get_queryset(self, request):
+        """
+        Customize the queryset based on the call. For the change, we will return the datacite
+        for the listing, we will return resourcebase
+        for the deleting, we can return all the datacite, django will sort them after
+        """
         if "/change" in request.path:
+            # if is a change, we need to return the datacite object
             return DataCite.objects.filter(
                 pk=request.resolver_match.kwargs["object_id"]
             )
+        if request.POST.get("action", "") == 'delete_selected':
+            # if is a post, means we want to delete the object so we have to return the 
+            # datacite object
+            return DataCite.objects.all()
         return ResourceBase.objects.filter(is_published=True, is_approved=True)
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """
+        We will return only the resources without any datacite associated
+        """
+        if db_field.name == "resource":
+            kwargs["queryset"] = ResourceBase.objects.filter(is_published=True, is_approved=True, datacite__isnull=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     def get_urls(self):
+        """
+        Add custom urls for manage the datacite operations
+        """
         return [
             path(
                 "findable/<resource_pk>/confirmation",
@@ -61,11 +85,15 @@ class DataCiteAdmin(admin.ModelAdmin):
         ] + super().get_urls()
 
     def confirmation(self, request, resource_pk):
+        """
+        Confirmation page, is called before a user try to publish to datacite in 
+        findable state
+        """
         if request.method == "POST":
             return self.findable(request, resource_pk)
         resource = get_object_or_404(ResourceBase, pk=resource_pk)
         return render(request, "admin/client/confirmation.html", {"resource": resource})
-
+    
     def draft(self, request, resource_pk):
         return self.generate_doi(request, resource_pk, event=DataCite.State.draft)
 
@@ -73,6 +101,9 @@ class DataCiteAdmin(admin.ModelAdmin):
         return self.generate_doi(request, resource_pk, event=DataCite.State.findable)
 
     def generate_doi(self, request, resource_pk, event):
+        """
+        Creates the DOI in Datacite and then update the DOI in GeoNode
+        """
         # getting GeoNode Resource
         try:
             resource = get_object_or_404(
