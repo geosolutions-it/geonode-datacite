@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import path
 
+from geonode_datacite.forms import DataCiteForm
 from geonode_datacite.utils import DATACITE_TYPE_MAPPING
 from geonode_datacite.handler import datacite_handler
 from geonode_datacite.models import DataCite
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 class DataCiteAdmin(admin.ModelAdmin):
     model = ResourceBase
+    form = DataCiteForm
     change_list_template = "admin/client/change_list.html"
 
     def get_readonly_fields(self, request, obj=None):
