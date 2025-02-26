@@ -45,6 +45,7 @@ class DataCiteAdmin(admin.ModelAdmin):
         for the listing, we will return resourcebase
         for the deleting, we can return all the datacite, django will sort them after
         """
+        # TODO improve me, find a better way to show the resource listing
         if "/change" in request.path:
             # if is a change, we need to return the datacite object
             return DataCite.objects.filter(
