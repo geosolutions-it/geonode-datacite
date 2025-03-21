@@ -14,7 +14,7 @@ class DataCiteForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and getattr(self.fields, "doi"):
+        if self.instance and hasattr(self.fields, "doi"):
             self.fields['doi'].initial = self.instance.resource.doi
 
     def save(self, commit = ...):
