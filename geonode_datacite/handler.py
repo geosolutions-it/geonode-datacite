@@ -88,7 +88,7 @@ class DataCiteHandler:
             "data": {
                 "type": "dois",
                 "attributes": {
-                    "event": data.get("event", settings.DATACITE_EVENT),
+                    "event": data.get("event", "draft"),
                     "prefix": data.get("prefix", self.prefix),
                     "creators": [
                         {
