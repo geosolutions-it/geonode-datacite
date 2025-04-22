@@ -124,7 +124,7 @@ class DataCiteAdmin(admin.ModelAdmin):
                    "title": resource.title,
                    "language": resource.language,
                    "resource_type": DATACITE_TYPE_MAPPING.get(resource_type),
-                   "url": build_absolute_uri(resource.detail_url)
+                   "url": build_absolute_uri(reverse("resolve_uuid", args=[resource.uuid]))
                }
             )
             data = response.json()
