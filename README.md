@@ -14,8 +14,22 @@ DATACITE_PREFIX="10.82863"
 DATACITE_CREATOR=""
 DATACITE_CREATOR_TYPE="Organizational"
 DATACITE_PUBLISHER="CNR"
+DATACITE_DETAIL_URL=https://handle.test.datacite.org
 
 ```
+
+In detail:
+
+- `DATACITE_API_URL`: URL of the API used for publishing the DOI | *example: https://api.test.datacite.org*
+- `DATACITE_API_USERNAME`: username user to login in Datacite
+- `DATACITE_API_PASSWORD`: password used to login in Datacite
+- `DATACITE_PREFIX`: Prefix to be used during the publication in DataCite. Is a numerical identifier, it identify the repository associated | *example: 10.82863*
+- `DATACITE_CREATOR`: Creator to be associated with the new DOI | *example CNR*
+- `DATACITE_CREATOR_TYPE`: Creator type to be associated with the DOI | *example Organizational*
+- `DATACITE_PUBLISHER`: Name of the publisher of the DOI | *example: CNR*
+- `DATACITE_DETAIL_URL`: URL which will be used to reach the DOI, the option could be *https://handle.test.datacite.org* for test and *https://doi.org/* for production
+
+
 
 ### Metadata required for datacite publishing
 
