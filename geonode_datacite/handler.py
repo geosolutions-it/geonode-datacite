@@ -107,7 +107,7 @@ class DataCiteHandler:
                         ).title()
                     },
                     "url": data.get("url"),
-                    "language": settings.DATACITE_ATTRIBUTE_LANGUAGE,
+                    "language": settings.DATACITE_LANGUAGE,
                     "rightsList": [{
                             "rights": data.get("license_name"),
                             }],

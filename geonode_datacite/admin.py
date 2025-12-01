@@ -113,9 +113,7 @@ class DataCiteAdmin(admin.ModelAdmin):
             resource = get_object_or_404(
                 ResourceBase, pk=resource_pk
             ).get_real_instance()
-            resource_type = resource.subtype
-            if isinstance(resource, Document):
-                resource_type = resource.extension
+            resource_type = settings.DATACITE_RESOURCE_TYPE_GENERAL
             # Extract geolocations from bbox
             geolocations = []
             if resource.bbox:
@@ -192,7 +190,7 @@ class DataCiteAdmin(admin.ModelAdmin):
                    "event": event,
                    "title": resource.title,
                    "language": resource.language,
-                   "resource_type": DATACITE_TYPE_MAPPING.get(resource_type),
+                   "resource_type": resource_type,
                    "url": build_absolute_uri(reverse("resolve_uuid", args=[resource.uuid])),
                    "abstract": resource.abstract,
                    "uuid": resource.uuid,
