@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.contrib import messages
 from geonode.utils import build_absolute_uri
 from geonode.resource.manager import resource_manager
+from geonode.metadata.manager import metadata_manager
 
 logger = logging.getLogger(__name__)
 # Register your models here.
@@ -115,6 +116,74 @@ class DataCiteAdmin(admin.ModelAdmin):
             resource_type = resource.subtype
             if isinstance(resource, Document):
                 resource_type = resource.extension
+            # Extract geolocations from bbox
+            geolocations = []
+            if resource.bbox:
+                try:
+                    bbox = resource.bbox
+                    xmin, xmax, ymin, ymax = bbox[0], bbox[1], bbox[2], bbox[3]
+                    
+                    # Calculate center point
+                    center_lon = (xmin + xmax) / 2
+                    center_lat = (ymin + ymax) / 2
+                    
+                    geolocation = {
+                        "geoLocationPoint": {
+                            "pointLongitude": center_lon,
+                            "pointLatitude": center_lat
+                        },
+                        "geoLocationBox": {
+                            "westBoundLongitude": xmin,
+                            "eastBoundLongitude": xmax,
+                            "southBoundLatitude": ymin,
+                            "northBoundLatitude": ymax
+                        }
+                    }
+                    geolocations.append(geolocation)
+                except Exception as e:
+                    print("Error extracting geolocation:", e)
+
+            try:
+                metadata = metadata_manager.build_schema_instance(resource)
+            except Exception as e:
+                logger.warning(f"Could not extract metadata using metadata_manager: {e}")
+                metadata = {}
+            # Extract creators from metadata (cnr_creator)
+            creators = []
+            cnr_creators = metadata.get('cnr_creator', [])
+            if isinstance(cnr_creators, list):
+                for cnr_c in cnr_creators:
+                    creator = {
+                        "name": cnr_c.get('fullname', ''),
+                        "nameType": settings.DATACITE_CREATOR_TYPE
+                    }
+                    if cnr_c.get('orcid'):
+                         creator["nameIdentifiers"] = [{
+                            "nameIdentifier": cnr_c.get('orcid'),
+                        }]
+                    if creator["name"]:
+                        creators.append(creator)
+
+
+            # Publisher with ROR identifier
+            publisher = {
+                "name": settings.DATACITE_PUBLISHER,
+                "publisherIdentifier": settings.DATACITE_PUBLISHER_ROR_ID,
+            }
+            
+            # Descriptions from abstract
+            descriptions = []
+            if resource.abstract:
+                descriptions.append({
+                    "description": resource.abstract,
+                    "descriptionType": "Abstract"
+                })
+
+            # Size from metadata (cnr_file_size)
+            sizes = []
+            file_size = metadata.get('cnr_file_size')
+            if file_size:
+                sizes.append(str(file_size))
 
             # callid datacite for the DOI generation
 
@@ -124,7 +193,15 @@ class DataCiteAdmin(admin.ModelAdmin):
                    "title": resource.title,
                    "language": resource.language,
                    "resource_type": DATACITE_TYPE_MAPPING.get(resource_type),
-                   "url": build_absolute_uri(reverse("resolve_uuid", args=[resource.uuid]))
+                   "url": build_absolute_uri(reverse("resolve_uuid", args=[resource.uuid])),
+                   "abstract": resource.abstract,
+                   "uuid": resource.uuid,
+                   "license_name": str(resource.license) if resource.license else '',
+                   "geolocations": geolocations,
+                   "creators": creators,
+                   "publisher": publisher,
+                   "descriptions": descriptions,
+                   "sizes": sizes,
                }
             )
             data = response.json()

@@ -90,26 +90,14 @@ class DataCiteHandler:
                 "attributes": {
                     "event": data.get("event", "draft"),
                     "prefix": data.get("prefix", self.prefix),
-                    "creators": [
-                        {
-                            "name": data.get("creator", settings.DATACITE_CREATOR),
-                            "nameType": data.get(
-                                "creator_type", settings.DATACITE_CREATOR_TYPE
-                            ),
-                        }
-                    ],
+                    "creators": data.get("creators", []),
                     "titles": [
                         {
                             "lang": data.get("lang", get_language()),
                             "title": data.get("title"),
                         }
                     ],
-                    "publisher": {
-                        "lang": data.get("lang", get_language()),
-                        "publishder": data.get(
-                            "publisher", settings.DATACITE_PUBLISHER
-                        ),
-                    },
+                    "publisher": data.get("publisher", {}),
                     "publicationYear": data.get(
                         "publication_year", datetime.now().strftime("%Y")
                     ),
@@ -119,6 +107,14 @@ class DataCiteHandler:
                         ).title()
                     },
                     "url": data.get("url"),
+                    "language": settings.DATACITE_ATTRIBUTE_LANGUAGE,
+                    "rightsList": [{
+                            "rights": data.get("license_name"),
+                            }],
+                    "descriptions": data.get("descriptions", []),
+                    "geoLocations": data.get("geolocations", []),
+                    "sizes": data.get("sizes", []),
+                    
                 },
             }
         }
