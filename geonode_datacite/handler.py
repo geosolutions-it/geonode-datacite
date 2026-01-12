@@ -106,6 +106,12 @@ class DataCiteHandler:
                             "resource_type", "Other"
                         ).title()
                     },
+                    "identifiers": [
+                        {
+                            "identifier": data.get("uuid"),
+                            "identifierType": "UUID",
+                        }
+                    ],
                     "url": data.get("url"),
                     "language": settings.DATACITE_LANGUAGE,
                     "rightsList": [{
@@ -114,6 +120,7 @@ class DataCiteHandler:
                     "descriptions": data.get("descriptions", []),
                     "geoLocations": data.get("geolocations", []),
                     "sizes": data.get("sizes", []),
+                    "formats": data.get("format", []),
                     
                 },
             }

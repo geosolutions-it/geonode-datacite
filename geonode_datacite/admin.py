@@ -153,11 +153,13 @@ class DataCiteAdmin(admin.ModelAdmin):
                 for cnr_c in cnr_creators:
                     creator = {
                         "name": cnr_c.get('fullname', ''),
-                        "nameType": settings.DATACITE_CREATOR_TYPE
+                        "nameType": "Personal",
                     }
                     if cnr_c.get('orcid'):
                          creator["nameIdentifiers"] = [{
                             "nameIdentifier": cnr_c.get('orcid'),
+                            "schemeUri": "https://orcid.org",
+                            "nameIdentifierScheme": "ORCID"
                         }]
                     if creator["name"]:
                         creators.append(creator)
@@ -168,6 +170,12 @@ class DataCiteAdmin(admin.ModelAdmin):
                 "name": settings.DATACITE_PUBLISHER,
                 "publisherIdentifier": settings.DATACITE_PUBLISHER_ROR_ID,
             }
+
+            try:
+                link = resource.link_set.filter(link_type='data').last()
+                format = [link.mime] if link and link.mime else []
+            except Exception:
+                format = []
             
             # Descriptions from abstract
             descriptions = []
@@ -200,6 +208,7 @@ class DataCiteAdmin(admin.ModelAdmin):
                    "publisher": publisher,
                    "descriptions": descriptions,
                    "sizes": sizes,
+                   "format": format,
                }
             )
             data = response.json()
