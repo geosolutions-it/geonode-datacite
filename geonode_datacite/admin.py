@@ -151,18 +151,29 @@ class DataCiteAdmin(admin.ModelAdmin):
             cnr_creators = metadata.get('cnr_creator', [])
             if isinstance(cnr_creators, list):
                 for cnr_c in cnr_creators:
+                    fullname = cnr_c.get('fullname', '').strip()
+                    orcid = cnr_c.get('orcid')
+                    if not fullname and not orcid:
+                        continue
+                    
                     creator = {
-                        "name": cnr_c.get('fullname', ''),
                         "nameType": "Personal",
                     }
-                    if cnr_c.get('orcid'):
-                         creator["nameIdentifiers"] = [{
-                            "nameIdentifier": cnr_c.get('orcid'),
+                    
+                    if fullname:
+                        name_parts = fullname.rsplit(' ', 1)
+                        if len(name_parts) == 2:
+                            creator["givenName"] = name_parts[0]
+                            creator["familyName"] = name_parts[1]
+                    
+                    if orcid:
+                        creator["nameIdentifiers"] = [{
+                            "nameIdentifier": orcid,
                             "schemeUri": "https://orcid.org",
                             "nameIdentifierScheme": "ORCID"
                         }]
-                    if creator["name"]:
-                        creators.append(creator)
+                    
+                    creators.append(creator)
 
 
             # Publisher with ROR identifier
