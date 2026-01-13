@@ -165,6 +165,8 @@ class DataCiteAdmin(admin.ModelAdmin):
                         if len(name_parts) == 2:
                             creator["givenName"] = name_parts[0]
                             creator["familyName"] = name_parts[1]
+                        else:
+                            creator["givenName"] = name_parts[0]
                     
                     if orcid:
                         creator["nameIdentifiers"] = [{
