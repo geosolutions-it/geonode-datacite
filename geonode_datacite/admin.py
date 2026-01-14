@@ -151,16 +151,31 @@ class DataCiteAdmin(admin.ModelAdmin):
             cnr_creators = metadata.get('cnr_creator', [])
             if isinstance(cnr_creators, list):
                 for cnr_c in cnr_creators:
+                    fullname = cnr_c.get('fullname', '').strip()
+                    orcid = cnr_c.get('orcid')
+                    if not fullname and not orcid:
+                        continue
+                    
                     creator = {
-                        "name": cnr_c.get('fullname', ''),
-                        "nameType": settings.DATACITE_CREATOR_TYPE
+                        "nameType": "Personal",
                     }
-                    if cnr_c.get('orcid'):
-                         creator["nameIdentifiers"] = [{
-                            "nameIdentifier": cnr_c.get('orcid'),
+                    
+                    if fullname:
+                        name_parts = fullname.rsplit(' ', 1)
+                        if len(name_parts) == 2:
+                            creator["givenName"] = name_parts[0]
+                            creator["familyName"] = name_parts[1]
+                        else:
+                            creator["givenName"] = name_parts[0]
+                    
+                    if orcid:
+                        creator["nameIdentifiers"] = [{
+                            "nameIdentifier": orcid,
+                            "schemeUri": "https://orcid.org",
+                            "nameIdentifierScheme": "ORCID"
                         }]
-                    if creator["name"]:
-                        creators.append(creator)
+                    
+                    creators.append(creator)
 
 
             # Publisher with ROR identifier
@@ -168,6 +183,12 @@ class DataCiteAdmin(admin.ModelAdmin):
                 "name": settings.DATACITE_PUBLISHER,
                 "publisherIdentifier": settings.DATACITE_PUBLISHER_ROR_ID,
             }
+
+            try:
+                link = resource.link_set.filter(link_type='data').last()
+                format = [link.mime] if link and link.mime else []
+            except Exception:
+                format = []
             
             # Descriptions from abstract
             descriptions = []
@@ -200,6 +221,7 @@ class DataCiteAdmin(admin.ModelAdmin):
                    "publisher": publisher,
                    "descriptions": descriptions,
                    "sizes": sizes,
+                   "format": format,
                }
             )
             data = response.json()
