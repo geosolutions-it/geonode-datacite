@@ -113,6 +113,37 @@ class DataCiteAdmin(admin.ModelAdmin):
             resource = get_object_or_404(
                 ResourceBase, pk=resource_pk
             ).get_real_instance()
+            datacite_entry = DataCite.objects.filter(resource=resource).first()
+
+            if datacite_entry:
+                if (
+                    datacite_entry.state == DataCite.State.draft
+                    and event == DataCite.State.findable
+                ):
+                    if resource.doi:
+                        datacite_handler.publish_doi(pk=resource.doi)
+                        datacite_entry.state = DataCite.State.findable
+                        datacite_entry.save()
+                        messages.add_message(
+                            request,
+                            messages.SUCCESS,
+                            f"DOI has been updated to Findable for resource: {resource.title}",
+                        )
+                    else:
+                        messages.add_message(
+                            request,
+                            messages.ERROR,
+                            f"Cannot publish to Findable because resource '{resource.title}' has no DOI set.",
+                        )
+                else:
+                    messages.add_message(
+                        request,
+                        messages.WARNING,
+                        f"DOI for resource '{resource.title}' is already in state '{datacite_entry.state}' and cannot be re-published as '{event}'.",
+                    )
+                return HttpResponseRedirect(
+                    reverse("admin:geonode_datacite_datacite_changelist")
+                )
             resource_type = settings.DATACITE_RESOURCE_TYPE_GENERAL
             # Extract geolocations from bbox
             geolocations = []
