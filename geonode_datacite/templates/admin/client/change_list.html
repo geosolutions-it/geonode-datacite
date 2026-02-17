@@ -86,12 +86,15 @@
               <td class="field-datacite-url"><a href="{{resource.datacite_set.first.url}}">{{resource.datacite_set.first.url}}</a></td>
               <td class="field-datacite_published">{{resource.datacite_set.first.created_at}}</td>
               <td class="field-datacite_published">{{resource.datacite_set.first.updated_at}}</td>
-              {% if resource.datacite_set.first.url %}
-              <td class="field-publisher"></td>
-              <td class="field-publisher"></td>
-              {% else %}
+              {% if not resource.datacite_set.first %}
               <td class="field-publisher"><a class="grp-button" href="draft/{{resource.pk}}">as Draft</a></td>
               <td class="field-publisher"><a class="grp-button" href="findable/{{resource.pk}}/confirmation">as Findable</a></td>
+              {% elif resource.datacite_set.first.state == 'Draft' %}
+              <td class="field-publisher"><a class="grp-button" href="findable/{{resource.pk}}/confirmation">Update to Findable</a></td>
+              <td class="field-publisher"></td>
+              {% else %}
+              <td class="field-publisher"></td>
+              <td class="field-publisher"></td>
               {% endif %}
             </tr>
         {% endfor %}        

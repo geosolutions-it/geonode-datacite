@@ -52,6 +52,20 @@ class DataCiteHandler:
         """
         return self.call_api({}, method="DELETE", pk=pk)
 
+    def publish_doi(self, pk: str = None) -> Dict:
+        """
+        Publish a draft DOI to findable state
+        """
+        data = {
+            "data": {
+                "type": "dois",
+                "attributes": {
+                    "event": "publish"
+                }
+            }
+        }
+        return self.call_api(data, method="PUT", pk=pk)
+
     def call_api(self, data: Dict, method: str, pk: str = "") -> Dict:
         """
         create the DOI via API and return the payload generated
