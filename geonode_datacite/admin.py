@@ -204,14 +204,13 @@ class DataCiteAdmin(admin.ModelAdmin):
                             }]
 
                         creators.append(creator)
-
-            # Fallback to static creator if nothing was extracted
-            if not creators and getattr(settings, "DATACITE_CREATOR", None):
-                creators.append({
-                    "name": settings.DATACITE_CREATOR,
-                    "nameType": settings.DATACITE_CREATOR_TYPE,
-                })
-
+            else:
+                # fallback only when no metadata field is configured
+                if getattr(settings, "DATACITE_CREATOR", None):
+                    creators.append({
+                        "name": settings.DATACITE_CREATOR,
+                        "nameType": settings.DATACITE_CREATOR_TYPE,
+                    })
 
             # Publisher
             publisher = {"name": settings.DATACITE_PUBLISHER}
