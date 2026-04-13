@@ -177,43 +177,47 @@ class DataCiteAdmin(admin.ModelAdmin):
             except Exception as e:
                 logger.warning(f"Could not extract metadata using metadata_manager: {e}")
                 metadata = {}
-            # Extract creators from metadata (cnr_creator)
+            # Extract creators from metadata (configurable field)
             creators = []
-            cnr_creators = metadata.get('cnr_creator', [])
-            if isinstance(cnr_creators, list):
-                for cnr_c in cnr_creators:
-                    fullname = cnr_c.get('fullname', '').strip()
-                    orcid = cnr_c.get('orcid')
-                    if not fullname and not orcid:
-                        continue
-                    
-                    creator = {
-                        "nameType": "Personal",
-                    }
-                    
-                    if fullname:
-                        name_parts = fullname.rsplit(' ', 1)
-                        if len(name_parts) == 2:
-                            creator["givenName"] = name_parts[0]
-                            creator["familyName"] = name_parts[1]
-                        else:
-                            creator["givenName"] = name_parts[0]
-                    
-                    if orcid:
-                        creator["nameIdentifiers"] = [{
-                            "nameIdentifier": orcid,
-                            "schemeUri": "https://orcid.org",
-                            "nameIdentifierScheme": "ORCID"
-                        }]
-                    
-                    creators.append(creator)
+            creator_field = getattr(settings, "CREATOR_METADATA_FIELD", None)
+            if creator_field:
+                field_value = metadata.get(creator_field)
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        fullname = (item.get("fullname") or "").strip()
+                        orcid = item.get("orcid")
+                        if not fullname and not orcid:
+                            continue
 
+                        creator = {"nameType": "Personal"}
+                        if fullname:
+                            name_parts = fullname.rsplit(" ", 1)
+                            creator["givenName"] = name_parts[0]
+                            if len(name_parts) == 2:
+                                creator["familyName"] = name_parts[1]
 
-            # Publisher with ROR identifier
-            publisher = {
-                "name": settings.DATACITE_PUBLISHER,
-                "publisherIdentifier": settings.DATACITE_PUBLISHER_ROR_ID,
-            }
+                        if orcid:
+                            creator["nameIdentifiers"] = [{
+                                "nameIdentifier": orcid,
+                                "schemeUri": "https://orcid.org",
+                                "nameIdentifierScheme": "ORCID",
+                            }]
+
+                        creators.append(creator)
+            else:
+                # fallback only when no metadata field is configured
+                if getattr(settings, "DATACITE_CREATOR", None):
+                    creators.append({
+                        "name": settings.DATACITE_CREATOR,
+                        "nameType": settings.DATACITE_CREATOR_TYPE,
+                    })
+
+            # Publisher
+            publisher = {"name": settings.DATACITE_PUBLISHER}
+            publisher_ror_id = getattr(settings, "DATACITE_PUBLISHER_ROR_ID", None)
+            if publisher_ror_id:
+                publisher["publisherIdentifier"] = publisher_ror_id
+
 
             try:
                 link = resource.link_set.filter(link_type='data').last()
@@ -229,11 +233,13 @@ class DataCiteAdmin(admin.ModelAdmin):
                     "descriptionType": "Abstract"
                 })
 
-            # Size from metadata (cnr_file_size)
+            # Size from metadata (configurable field)
             sizes = []
-            file_size = metadata.get('cnr_file_size')
-            if file_size:
-                sizes.append(str(file_size))
+            file_size_field = getattr(settings, "FILE_SIZE_METADATA_FIELD", None)
+            if file_size_field:
+                file_size = metadata.get(file_size_field)
+                if file_size:
+                    sizes.append(str(file_size))
 
             # callid datacite for the DOI generation
 
