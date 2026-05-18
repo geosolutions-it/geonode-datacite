@@ -29,8 +29,9 @@
 {% block content %}
     <h1>Are you sure you want to publish the resource: {{ resource }}?</h1><br>
     <div class="custom_alert">
-        <h2>Once the resource is published on DataCite the permissions on the resource are set to download</h2>
-        <br><h2>This operation cannot be reverted</h2>
+        <h2>Transition from Draft to Findable</h2>
+        <h2>This operation publishes the resource on DataCite, activating the DOI and making it publicly indexable and accessible</h2>
+        <br><h2>Once the publication is complete, the resource will become findable, and it will no longer be possible to return to the Draft state</h2>
     </div>
     <form method="post">{% csrf_token %}
         <div>
