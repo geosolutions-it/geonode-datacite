@@ -115,26 +115,19 @@ class DataCiteAdmin(admin.ModelAdmin):
             ).get_real_instance()
             datacite_entry = DataCite.objects.filter(resource=resource).first()
 
-            if datacite_entry:
+            if datacite_entry and resource.doi:
                 if (
                     datacite_entry.state == DataCite.State.draft
                     and event == DataCite.State.findable
                 ):
-                    if resource.doi:
-                        datacite_handler.publish_doi(pk=resource.doi)
-                        datacite_entry.state = DataCite.State.findable
-                        datacite_entry.save()
-                        messages.add_message(
-                            request,
-                            messages.SUCCESS,
-                            f"DOI has been updated to Findable for resource: {resource.title}",
-                        )
-                    else:
-                        messages.add_message(
-                            request,
-                            messages.ERROR,
-                            f"Cannot publish to Findable because resource '{resource.title}' has no DOI set.",
-                        )
+                    datacite_handler.publish_doi(pk=resource.doi)
+                    datacite_entry.state = DataCite.State.findable
+                    datacite_entry.save()
+                    messages.add_message(
+                        request,
+                        messages.SUCCESS,
+                        f"DOI has been updated to Findable for resource: {resource.title}",
+                    )
                 else:
                     messages.add_message(
                         request,
@@ -263,11 +256,9 @@ class DataCiteAdmin(admin.ModelAdmin):
             )
             data = response.json()
 
-            obj = DataCite(
-                resource=resource,
-                url=f"{settings.DATACITE_DETAIL_URL}/{data['data']['id']}",
-                state=event,
-            )
+            obj = datacite_entry or DataCite(resource=resource)
+            obj.url = f"{settings.DATACITE_DETAIL_URL}/{data['data']['id']}"
+            obj.state = event
             obj.save()
             # update resource object
             resource_manager.update(
