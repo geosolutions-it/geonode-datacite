@@ -21,13 +21,11 @@ class DataCiteHandler:
         self.url = settings.DATACITE_API_URL
         self.user = settings.DATACITE_API_USERNAME
         self.password = settings.DATACITE_API_PASSWORD
-        self.prefix = getattr(settings, "DATACITE_PREFIX", "10.82863")
+        self.prefix = settings.DATACITE_PREFIX
         self.event_mapping = {
             "draft": "draft",
-            "Draft": "draft",
             "publish": "publish",
             "findable": "publish",
-            "Findable": "publish",
         }
 
     def create_doi(self, data: Dict = {}) -> Dict:
@@ -105,7 +103,7 @@ class DataCiteHandler:
         Given the context will populate the DataCite doi metadata schema
         to generate the DOI via API
         """
-        event = data.get("event", "draft")
+        event = data.get("event", "draft").lower()
         return {
             "data": {
                 "type": "dois",
