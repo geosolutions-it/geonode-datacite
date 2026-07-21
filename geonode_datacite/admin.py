@@ -25,6 +25,7 @@ class DataCiteAdmin(admin.ModelAdmin):
     model = ResourceBase
     form = DataCiteForm
     change_list_template = "admin/client/change_list.html"
+    search_fields = ("title",)
 
     def get_readonly_fields(self, request, obj=None):
         """
