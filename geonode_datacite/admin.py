@@ -139,17 +139,16 @@ class DataCiteAdmin(admin.ModelAdmin):
                     reverse("admin:geonode_datacite_datacite_changelist")
                 )
             resource_type = settings.DATACITE_RESOURCE_TYPE_GENERAL
-            # Extract geolocations from bbox
             geolocations = []
-            if resource.bbox:
+            if resource.ll_bbox:
                 try:
-                    bbox = resource.bbox
-                    xmin, xmax, ymin, ymax = bbox[0], bbox[1], bbox[2], bbox[3]
-                    
+                    bbox = resource.ll_bbox
+                    xmin, xmax, ymin, ymax = (float(coord) for coord in bbox[:4])
+
                     # Calculate center point
                     center_lon = (xmin + xmax) / 2
                     center_lat = (ymin + ymax) / 2
-                    
+
                     geolocation = {
                         "geoLocationPoint": {
                             "pointLongitude": center_lon,
@@ -164,7 +163,7 @@ class DataCiteAdmin(admin.ModelAdmin):
                     }
                     geolocations.append(geolocation)
                 except Exception as e:
-                    print("Error extracting geolocation:", e)
+                    logger.warning(f"Error extracting geolocation: {e}")
 
             try:
                 metadata = metadata_manager.build_schema_instance(resource)
