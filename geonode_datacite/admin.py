@@ -14,7 +14,7 @@ from geonode.documents.models import Document
 from django.urls import reverse
 from django.contrib import messages
 from geonode.utils import build_absolute_uri
-from geonode.resource.manager import resource_manager
+from geonode.resource.registry import resource_manager_registry
 from geonode.metadata.manager import metadata_manager
 
 logger = logging.getLogger(__name__)
@@ -261,6 +261,7 @@ class DataCiteAdmin(admin.ModelAdmin):
             obj.state = event
             obj.save()
             # update resource object
+            resource_manager = resource_manager_registry.get_for_instance(resource)
             resource_manager.update(
                 str(resource.uuid), resource=resource, vals={"doi": data["data"]["id"]}
             )
