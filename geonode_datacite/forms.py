@@ -1,7 +1,7 @@
 from django import forms
 
 from geonode_datacite.models import DataCite
-from geonode.resource.manager import resource_manager
+from geonode_datacite.utils import update_resource_doi
 
 
 
@@ -21,6 +21,6 @@ class DataCiteForm(forms.ModelForm):
         instance = super().save(commit)
         
         # updating DOI with the one provided vua form
-        resource_manager.update(instance.resource.uuid, instance.resource, vals={"doi": self.cleaned_data['doi']})
+        update_resource_doi(instance.resource, self.cleaned_data['doi'])
 
         return instance
