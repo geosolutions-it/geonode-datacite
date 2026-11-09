@@ -63,3 +63,18 @@ DATACITE_TYPE_MAPPING = {
     "raster": "Dataset",
     "3dtiles": "Dataset",
 }
+
+
+def get_resource_manager(resource):
+    try:
+        # GeoNode >= 5.1.0
+        from geonode.resource.registry import resource_manager_registry
+    except ImportError:
+        # GeoNode < 5.1.0
+        from geonode.resource.manager import resource_manager
+        return resource_manager
+    return resource_manager_registry.get_for_instance(resource)
+
+
+def update_resource_doi(resource, doi):
+    return get_resource_manager(resource).update(str(resource.uuid), resource, vals={"doi": doi})

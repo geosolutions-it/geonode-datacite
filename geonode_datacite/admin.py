@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import path
 
 from geonode_datacite.forms import DataCiteForm
-from geonode_datacite.utils import DATACITE_TYPE_MAPPING
+from geonode_datacite.utils import DATACITE_TYPE_MAPPING, update_resource_doi
 from geonode_datacite.handler import datacite_handler
 from geonode_datacite.models import DataCite
 from geonode.base.models import ResourceBase
@@ -14,7 +14,6 @@ from geonode.documents.models import Document
 from django.urls import reverse
 from django.contrib import messages
 from geonode.utils import build_absolute_uri
-from geonode.resource.manager import resource_manager
 from geonode.metadata.manager import metadata_manager
 
 logger = logging.getLogger(__name__)
@@ -261,10 +260,7 @@ class DataCiteAdmin(admin.ModelAdmin):
             obj.state = event
             obj.save()
             # update resource object
-            resource_manager.update(
-                str(resource.uuid), resource=resource, vals={"doi": data["data"]["id"]}
-            )
-
+            update_resource_doi(resource, data["data"]["id"])
             messages.add_message(
                 request,
                 messages.SUCCESS,
