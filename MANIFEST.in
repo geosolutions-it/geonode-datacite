@@ -1,0 +1,1 @@
+recursive-include geonode_datacite/templates *.html
