@@ -141,7 +141,7 @@ class DataCiteHandler:
                     "geoLocations": data.get("geolocations", []),
                     "sizes": data.get("sizes", []),
                     "formats": data.get("format", []),
-                    
+                    "version": data.get("version"),
                 },
             }
         }
