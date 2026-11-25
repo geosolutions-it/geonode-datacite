@@ -251,6 +251,7 @@ class DataCiteAdmin(admin.ModelAdmin):
                    "descriptions": descriptions,
                    "sizes": sizes,
                    "format": format,
+                   "version": metadata.get(settings.DATACITE_VERSION, None)
                }
             )
             data = response.json()
